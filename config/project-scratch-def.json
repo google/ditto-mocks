@@ -1,0 +1,12 @@
+{
+  "orgName": "Google",
+  "edition": "Developer",
+  "features": [],
+  "settings": {
+    "caseSettings": {
+      "emailToCase": { "enableEmailToCase": true },
+      "enableCaseFeed": true,
+      "enableDraftEmails": true
+    }
+  }
+}

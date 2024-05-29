@@ -111,7 +111,9 @@ public inherited sharing class TestRecord {
    * Attempted to follow go/java-practices/builders#api, so this is a nested class
    * even though the `TestRecord` is not what's being built.
    */
-  @SuppressWarnings('PMD.CyclomaticComplexity')
+  @SuppressWarnings(
+    'PMD.CyclomaticComplexity, PMD.EagerlyLoadedDescribeSObjectResult'
+  )
   public class Builder {
     private final Schema.SObjectType sObjectType;
     private final Map<Schema.SObjectField, Object> fields = new Map<Schema.SObjectField, Object>();
@@ -128,7 +130,7 @@ public inherited sharing class TestRecord {
           fieldToChildRelationship = new Map<Schema.SObjectField, Schema.ChildRelationship>();
           for (
             Schema.ChildRelationship childRelationship : this.sObjectType.getDescribe(
-                SObjectDescribeOptions.DEFERRED
+                SObjectDescribeOptions.FULL
               )
               .getChildRelationships()
           ) {

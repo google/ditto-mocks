@@ -23,14 +23,11 @@
   'PMD.ExcessivePublicCount, PMD.ExcessiveParameterList, PMD.EmptyCatchBlock, PMD.CyclomaticComplexity, PMD.AvoidBooleanParameter'
 )
 public inherited sharing class FakeDML extends DML {
-  private static final String CREATED = 'created';
-  private static final String ERRORS = 'errors';
   private static final String FIELDS = 'fields';
   private static final String ID = 'id';
   private static final String MESSAGE = 'message';
   private static final String MISMATCHED_INPUT_AND_RESPONSE_SIZE = 'The size of the mocked responses must equal the size of the sObject collection.';
   private static final String STATUS_CODE = 'statusCode';
-  private static final String SUCCESS = 'success';
 
   public List<List<SObject>> deletedRecords = new List<List<SObject>>();
   public List<List<SObject>> insertedRecords = new List<List<SObject>>();
@@ -109,26 +106,37 @@ public inherited sharing class FakeDML extends DML {
     return buildResultJson(resultId, isSuccess, resultErrors, null);
   }
 
+  private class ResultJson {
+    public final Boolean created;
+    public final Boolean success;
+    public final Id id;
+    public final List<Database.Error> errors;
+
+    @SuppressWarnings('PMD.ExcessiveParameterList')
+    public ResultJson(
+      Id id,
+      Boolean success,
+      List<Database.Error> errors,
+      Boolean created
+    ) {
+      this.created = created;
+      this.errors = errors;
+      this.id = id;
+      this.success = success;
+    }
+  }
+
   private static String buildResultJson(
     Id resultId,
     Boolean isSuccess,
     List<Database.Error> resultErrors,
     Boolean isCreated
   ) {
-    Map<String, Object> xResult = new Map<String, Object>();
-    if (resultId != null) {
-      xResult.put(ID, resultId);
-    }
-    if (isSuccess != null) {
-      xResult.put(SUCCESS, isSuccess);
-    }
-    if (resultErrors != null) {
-      xResult.put(ERRORS, resultErrors);
-    }
-    if (isCreated != null) {
-      xResult.put(CREATED, isCreated);
-    }
-    return JSON.serialize(xResult);
+    Boolean suppressNulls = true;
+    return JSON.serialize(
+      new ResultJson(resultId, isSuccess, resultErrors, isCreated),
+      suppressNulls
+    );
   }
 
   public override Database.DeleteResult doDelete(
@@ -462,9 +470,7 @@ public inherited sharing class FakeDML extends DML {
      * @return ErrorBuilder
      */
     public ErrorBuilder addErrorField(String field) {
-      if (this.errorFields == null) {
-        this.errorFields = new List<String>();
-      }
+      this.errorFields = this.errorFields ?? new List<String>();
       this.errorFields.add(field);
       return this;
     }
@@ -480,7 +486,7 @@ public inherited sharing class FakeDML extends DML {
         STATUS_CODE => this.errorStatusCode
       };
       return (Database.Error) JSON.deserialize(
-        JSON.serializePretty(error),
+        JSON.serialize(error),
         Database.Error.class
       );
     }
@@ -520,9 +526,7 @@ public inherited sharing class FakeDML extends DML {
      * @return SaveResultBuilder
      */
     public SaveResultBuilder addError(Database.Error error) {
-      if (this.errors == null) {
-        this.errors = new List<Database.Error>();
-      }
+      this.errors = this.errors ?? new List<Database.Error>();
       this.errors.add(error);
       return this;
     }
@@ -573,9 +577,7 @@ public inherited sharing class FakeDML extends DML {
      * @return DeleteResultBuilder
      */
     public DeleteResultBuilder addError(Database.Error error) {
-      if (this.errors == null) {
-        this.errors = new List<Database.Error>();
-      }
+      this.errors = this.errors ?? new List<Database.Error>();
       this.errors.add(error);
       return this;
     }
@@ -626,9 +628,7 @@ public inherited sharing class FakeDML extends DML {
      * @return UndeleteResultBuilder
      */
     public UndeleteResultBuilder addError(Database.Error error) {
-      if (this.errors == null) {
-        this.errors = new List<Database.Error>();
-      }
+      this.errors = this.errors ?? new List<Database.Error>();
       this.errors.add(error);
       return this;
     }
@@ -680,9 +680,7 @@ public inherited sharing class FakeDML extends DML {
      * @return UpsertResultBuilder
      */
     public UpsertResultBuilder addError(Database.Error error) {
-      if (this.errors == null) {
-        this.errors = new List<Database.Error>();
-      }
+      this.errors = this.errors ?? new List<Database.Error>();
       this.errors.add(error);
       return this;
     }

@@ -161,9 +161,7 @@ public inherited sharing class FakeEmailMessageSender extends EmailMessageSender
       return this;
     }
     public EmailResultBuilder addError(Messaging.SendEmailError error) {
-      if (this.errors == null) {
-        this.errors = new List<Messaging.SendEmailError>();
-      }
+      this.errors = this.errors ?? new List<Messaging.SendEmailError>();
       this.errors.add(error);
       return this;
     }

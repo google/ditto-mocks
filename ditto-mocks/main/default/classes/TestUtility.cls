@@ -20,7 +20,7 @@
  */
 @IsTest
 public class TestUtility {
-  private static Integer myNumber = 1;
+  private static Integer stubRecordCount = 1;
 
   /**
    * @description Returns a syntactically correct fake record Id.
@@ -31,11 +31,22 @@ public class TestUtility {
    * Case myCase = new Case(Id = TestUtility.getFakeId(Schema.Case.SObjectType));
    */
   public static Id getFakeId(Schema.SObjectType sObjectType) {
-    String result = String.valueOf(myNumber++);
+    String result = String.valueOf(stubRecordCount++);
     return (Id) (sObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
       .getKeyPrefix() +
     '0'.repeat(12 - result.length()) +
     result);
+  }
+
+  private class ChildrenSObjects {
+    public final List<SObject> records;
+    public final Boolean done = true;
+    public final Integer totalSize;
+
+    public ChildrenSObjects(List<SObject> records) {
+      this.records = records;
+      this.totalSize = records.size();
+    }
   }
 
   /**
@@ -64,18 +75,12 @@ public class TestUtility {
     List<SObject> children,
     String parentSideRelationshipName
   ) {
-    String targetJson = JSON.serialize(parent);
-
-    String childrenJson = '"' + parentSideRelationshipName + '" : {';
-    childrenJson += '"totalSize" : ' + children.size() + ',';
-    childrenJson += '"done" : true,';
-    childrenJson += '"records" : ' + JSON.serialize(children);
-    childrenJson += '}';
-
-    targetJson =
-      targetJson.substring(0, targetJson.length() - 1) +
-      ',' +
-      childrenJson +
+    String targetJson =
+      JSON.serialize(parent).removeEnd('}') +
+      ', "' +
+      parentSideRelationshipName +
+      '": ' +
+      JSON.serialize(new ChildrenSObjects(children)) +
       '}';
 
     return (SObject) JSON.deserialize(targetJson, SObject.class);

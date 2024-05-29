@@ -4,11 +4,25 @@
   "overrides": [
     {
       "files": "**/lwc/**/*.html",
-      "options": { "parser": "lwc" }
+      "options": {
+        "parser": "lwc"
+      }
     },
     {
       "files": "*.{cmp,page,component,email,auradoc,design}",
-      "options": { "parser": "html", "htmlWhitespaceSensitivity": "ignore" }
+      "options": {
+        "parser": "html",
+        "htmlWhitespaceSensitivity": "ignore"
+      }
+    },
+    {
+      "files": "*.{cls, apex}",
+      "options": {
+        "parser": "apex"
+      }
     }
+  ],
+  "plugins": [
+    "prettier-plugin-apex"
   ]
 }
